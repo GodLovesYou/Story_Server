@@ -4,11 +4,7 @@ const connection = require('./db');
 
 /* GET users listing. */
 router.get('/', function(req, res) {
-    let UserRoleId = req.body.UserRoleId;
-    let sql = `SELECT a.Id,a.Name,a.LoginPwd,a.Mail,a.RegisterTime,a.Phone,a.Address,a.LoginName,a.Phone,b.Name FROM Users  a,UserRoles  b WHERE a.UserRoleId=b.Id`;
-    if (UserRoleId!==undefined){
-        sql += `AND UserRoleId = ` + UserRoleId;
-    }
+    let sql = `SELECT * from UserRoles`;
     let jsonStr={
         errorCode:"0x0000",
         content:null
