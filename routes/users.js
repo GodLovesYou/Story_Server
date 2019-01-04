@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const sd = require('silly-datetime');
 const connection = require('./db');
 
 /* GET users listing. */
@@ -58,16 +59,19 @@ router.post('/', function(req, res, next) {
 });
 
 router.put('/', function(req, res) {
-    let Name = req.body.Name;
-    let LoginPwd = req.body.LoginPwd;
-    let Mail = req.body.Mail;
-    let RegisterTime = req.body.RegisterTime;
-    let Phone = req.body.Phone;
-    let Address = req.body.Address;
-    let LoginName = req.body.LoginName;
-    let UserRoleId = req.body.UserRoleId;
-    let sql=`INSERT INTO Users (Name, LoginPwd, Mail, RegisterTime, Phone, Address, LoginName, UserRoleId) 
-    VALUES(${Name},${LoginPwd},${Mail},${RegisterTime},${Phone},${Address},${LoginName},${UserRoleId},)`;
+    let param = JSON.parse(Object.keys(req.body));
+    let Name = param.name;
+    let LoginPwd = param.password;
+    let Mail = param.email;
+    let Phone = param.phone;
+    let Address = param.address;
+    let LoginName = param.username;
+    let sex = param.sex;
+    let card = param.card;
+    let birthday = sd.format(new Date(param.birth), 'YYYY-MM-DD');;
+    let datetime=sd.format(new Date(), 'YYYY-MM-DD HH:mm');
+    let sql=`INSERT INTO Users (Name, LoginPwd, Mail, RegisterTime, Phone, Address, LoginName, card, sex, birth ) 
+    VALUES('${Name}','${LoginPwd}','${Mail}','${datetime}','${Phone}','${Address}','${LoginName}','${card}','${sex}','${birthday}')`;
     let jsonStr={
         errorCode:"0x0000",
         content:null
@@ -101,6 +105,27 @@ router.delete('/', function(req, res) {
     })
 });
 
+/* GET home page. */
+router.post('/login', function (req, res) {
+    let jsonStr={
+        errorCode:"0x0000",
+        content:null
+    };
+    let sql = "select * from users";
+    let params = JSON.parse(Object.keys(req.body));
+    let username = params.username;
+    let password = params.password;
+    connection.query(sql, function (err, result) {
+        if (err) {
+            jsonStr.errorCode = "0x0001"
+            jsonStr.content = null
+            res.json(jsonStr)
+        } else {
+            jsonStr.content = result
+            res.json(jsonStr)
+        }
+    })
+})
 
 
 module.exports = router;
